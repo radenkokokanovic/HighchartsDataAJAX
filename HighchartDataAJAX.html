@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Highcharts</title>
+	<script src="https://code.highcharts.com/highcharts.js"></script>
+<script src="https://code.highcharts.com/modules/exporting.js"></script>
+<script src="https://code.highcharts.com/modules/export-data.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.0/css/bootstrap.min.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.0/umd/popper.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.0/js/bootstrap.min.js"></script>
+
+
+
+</head>
+<body onload="ispis()">
+
+<div class="row" style="height: 500px">
+  <div class="col-sm-6" id="container"></div>
+   <div class="col-sm-6" id="container2"></div>
+
+</div>
+  <div id="demo"></div>
+  
+<script>
+	function mojispis()
+	{
+		var niz=[];
+	
+	 var xhttp = new XMLHttpRequest();
+  xhttp.onreadystatechange = function() {
+    if (this.readyState == 4 && this.status == 200) {
+      var myObj, i, x = "";
+
+	     var str = this.responseText;
+    
+		ar= str.split('|'); // empty string separator
+		
+		var niz2;
+		for( var i=0;i<ar.length;i++)
+		{
+
+			niz[i]=ar[i].split(',');
+			niz[i][1]=parseFloat(niz[i][1]);
+			console.log(niz[i][1]);
+		
+
+		}
+		
+		console.log(niz);
+		grafik(niz)
+		
+
+      
+    }
+  };
+  xhttp.open("GET", "http://localhost:8080/grafik", true);
+  xhttp.send();
+  console.log(niz);
+		return niz;
+		
+
+	}
+	function ispis()
+	{
+		var text=mojispis();
+		console.log(text);
+		//grafik(text)
+		document.getElementById("demo").innerHTML = text;
+	
+	}
+
+	function grafik(podaci)
+	{
+		 var xhttp = new XMLHttpRequest();
+  xhttp.onreadystatechange = function() {
+    if (this.readyState == 4 && this.status == 200) {
+      var myObj, i, x = "";
+
+	     var str = this.responseText;
+	    
+		console.log(str);
+		grafik2(JSON.parse(this.responseText));
+		
+
+      
+    }
+  };
+  xhttp.open("GET", "http://localhost:8080/grafikSecond", true);
+  xhttp.send();
+		console.log("Podacii "+podaci);
+		
+		
+Highcharts.chart('container', {
+    chart: {
+        type: 'column'
+    },
+    title: {
+        text: 'Big city in Europe'
+    },
+    subtitle: {
+        text: 'Source: <a href="http://en.wikipedia.org/wiki/List_of_cities_proper_by_population">Wikipedia</a>'
+    },
+    xAxis: {
+        type: 'category',
+        labels: {
+            rotation: -45,
+            style: {
+                fontSize: '13px',
+                fontFamily: 'Verdana, sans-serif'
+            }
+        }
+    },
+    yAxis: {
+        min: 0,
+        title: {
+            text: 'Population (millions)'
+        }
+    },
+    legend: {
+        enabled: false
+    },
+    tooltip: {
+        pointFormat: 'Population in 2017: <b>{point.y:.1f} millions</b>'
+    },
+    series: [{
+        name: 'Population',
+        data:podaci ,
+        dataLabels: {
+            enabled: true,
+            rotation: -90,
+            color: '#FFFFFF',
+            align: 'right',
+            format: '{point.y:.1f}', // one decimal
+            y: 10, // 10 pixels down from the top
+            style: {
+                fontSize: '13px',
+                fontFamily: 'Verdana, sans-serif'
+            }
+        }
+    }]
+});
+
+
+
+}
+function grafik2(podaci)
+{
+
+	Highcharts.chart('container2', {
+
+    title: {
+        text: 'Solar Employment Growth by Sector, 2010-2016'
+    },
+
+    subtitle: {
+        text: 'Source: thesolarfoundation.com'
+    },
+
+    yAxis: {
+        title: {
+            text: 'Number of Employees'
+        }
+    },
+    legend: {
+        layout: 'vertical',
+        align: 'right',
+        verticalAlign: 'middle'
+    },
+
+    plotOptions: {
+        series: {
+            label: {
+                connectorAllowed: false
+            },
+            pointStart: 2010
+        }
+    },
+
+    series: podaci,
+
+    responsive: {
+        rules: [{
+            condition: {
+                maxWidth: 500
+            },
+            chartOptions: {
+                legend: {
+                    layout: 'horizontal',
+                    align: 'center',
+                    verticalAlign: 'bottom'
+                }
+            }
+        }]
+    }
+
+});
+}
+
+</script>
+</body>
+</html>
